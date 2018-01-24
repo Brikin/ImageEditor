@@ -54,10 +54,10 @@
 		4459AEBB20189A12002E1A9A /* ImageEditor */ = {
 			isa = PBXGroup;
 			children = (
+				4459AEC320189A12002E1A9A /* Assets.xcassets */,
+				4459AEC020189A12002E1A9A /* Main.storyboard */,
 				4459AEBC20189A12002E1A9A /* AppDelegate.swift */,
 				4459AEBE20189A12002E1A9A /* ViewController.swift */,
-				4459AEC020189A12002E1A9A /* Main.storyboard */,
-				4459AEC320189A12002E1A9A /* Assets.xcassets */,
 				4459AEC520189A12002E1A9A /* LaunchScreen.storyboard */,
 				4459AEC820189A12002E1A9A /* Info.plist */,
 			);
