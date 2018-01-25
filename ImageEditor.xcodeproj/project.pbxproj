@@ -12,6 +12,7 @@
 		4459AEC220189A12002E1A9A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4459AEC020189A12002E1A9A /* Main.storyboard */; };
 		4459AEC420189A12002E1A9A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4459AEC320189A12002E1A9A /* Assets.xcassets */; };
 		4459AEC720189A12002E1A9A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4459AEC520189A12002E1A9A /* LaunchScreen.storyboard */; };
+		4464BCDD2019C45F00134BDF /* CollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4464BCDC2019C45F00134BDF /* CollectionCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		4459AEC320189A12002E1A9A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4459AEC620189A12002E1A9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4459AEC820189A12002E1A9A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4464BCDC2019C45F00134BDF /* CollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,10 +56,11 @@
 		4459AEBB20189A12002E1A9A /* ImageEditor */ = {
 			isa = PBXGroup;
 			children = (
+				4459AEBC20189A12002E1A9A /* AppDelegate.swift */,
 				4459AEC320189A12002E1A9A /* Assets.xcassets */,
 				4459AEC020189A12002E1A9A /* Main.storyboard */,
-				4459AEBC20189A12002E1A9A /* AppDelegate.swift */,
 				4459AEBE20189A12002E1A9A /* ViewController.swift */,
+				4464BCDC2019C45F00134BDF /* CollectionCell.swift */,
 				4459AEC520189A12002E1A9A /* LaunchScreen.storyboard */,
 				4459AEC820189A12002E1A9A /* Info.plist */,
 			);
@@ -138,6 +141,7 @@
 			files = (
 				4459AEBF20189A12002E1A9A /* ViewController.swift in Sources */,
 				4459AEBD20189A12002E1A9A /* AppDelegate.swift in Sources */,
+				4464BCDD2019C45F00134BDF /* CollectionCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

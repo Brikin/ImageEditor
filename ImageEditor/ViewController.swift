@@ -10,6 +10,15 @@ import UIKit
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
+    var finalImages = [UIImage]()
+    
+    @IBOutlet weak var collectionView: UICollectionView!
+    @IBAction func rotateButtonTapped(_ sender: Any) {
+        
+        finalImages.append(imageView.image!)
+        collectionView.reloadData()
+    }
+    
     @IBOutlet weak var imageView: UIImageView!
     
     @IBAction func tapImageView(_ sender: UITapGestureRecognizer) {
@@ -17,7 +26,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         controller.delegate = self
         controller.sourceType = .photoLibrary
         present(controller, animated: true, completion: nil)
-        print("Image Tapped.")
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -32,4 +40,36 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
 
 
 }
+
+extension ViewController: UICollectionViewDataSource {
+    
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return finalImages.count
+    }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! CollectionCell
+        cell.backgroundColor = UIColor.darkGray
+        cell.cellImage.image = finalImages[indexPath.row]
+        return cell
+    }
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
