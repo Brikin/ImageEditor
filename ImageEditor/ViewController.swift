@@ -13,13 +13,26 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     var finalImages = [UIImage]()
     
     @IBOutlet weak var collectionView: UICollectionView!
-    @IBAction func rotateButtonTapped(_ sender: Any) {
-        
-        finalImages.append(imageView.image!)
+    @IBOutlet weak var imageView: UIImageView!
+    
+    @IBAction func inverColorsButtonTapped(_ sender: Any) {
+        let newImage = imageView.image?.convertImageToBW()
+        finalImages.append(newImage!)
         collectionView.reloadData()
     }
     
-    @IBOutlet weak var imageView: UIImageView!
+    @IBAction func mirrorImageButtonTapped(_ sender: Any) {
+        let newImage = imageView.image?.imageRotatedByDegrees(degrees: 0, flip: true)
+        finalImages.append(newImage!)
+        collectionView.reloadData()
+    }
+    
+    
+    @IBAction func rotateButtonTapped(_ sender: Any) {
+       let newImage = imageView.image?.imageRotatedByDegrees(degrees: 90, flip: false)
+        finalImages.append(newImage!)
+        collectionView.reloadData()
+    }
     
     @IBAction func tapImageView(_ sender: UITapGestureRecognizer) {
         let controller = UIImagePickerController()
@@ -58,7 +71,63 @@ extension ViewController: UICollectionViewDataSource {
     
 }
 
-
+extension UIImage {
+    
+    func imageRotatedByDegrees(degrees: CGFloat, flip: Bool) -> UIImage {
+        let radiansToDegrees: (CGFloat) -> CGFloat = {
+            return $0 * (180.0 / CGFloat.pi)
+        }
+        let degreesToRadians: (CGFloat) -> CGFloat = {
+            return $0 / 180.0 * CGFloat.pi
+        }
+        
+        // calculate the size of the rotated view's containing box for our drawing space
+        let rotatedViewBox = UIView(frame: CGRect(origin: .zero, size: size))
+        let t = CGAffineTransform(rotationAngle: degreesToRadians(degrees));
+        rotatedViewBox.transform = t
+        let rotatedSize = rotatedViewBox.frame.size
+        
+        // Create the bitmap context
+        UIGraphicsBeginImageContext(rotatedSize)
+        let bitmap = UIGraphicsGetCurrentContext()
+        
+        // Move the origin to the middle of the image so we will rotate and scale around the center.
+        bitmap?.translateBy(x: rotatedSize.width / 2.0, y: rotatedSize.height / 2.0)
+        
+        //   // Rotate the image context
+        bitmap?.rotate(by: degreesToRadians(degrees))
+        
+        // Now, draw the rotated/scaled image into the context
+        var yFlip: CGFloat
+        
+        if(flip){
+            yFlip = CGFloat(-1.0)
+        } else {
+            yFlip = CGFloat(1.0)
+        }
+        
+        bitmap?.scaleBy(x: yFlip, y: -1.0)
+        let rect = CGRect(x: -size.width / 2, y: -size.height / 2, width: size.width, height: size.height)
+        
+        bitmap?.draw(cgImage!, in: rect)
+        
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return newImage!
+    }
+    
+    func convertImageToBW() -> UIImage {
+        let context = CIContext(options: nil)
+        let currentFilter = CIFilter(name: "CIPhotoEffectNoir")!
+        currentFilter.setValue(CIImage(image: self), forKey: kCIInputImageKey)
+        let output = currentFilter.outputImage!
+        let cgImage = context.createCGImage(output, from: output.extent)!
+        let processedImage = UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
+        
+        return processedImage
+    }
+}
 
 
 
