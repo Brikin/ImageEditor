@@ -15,7 +15,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var imageView: UIImageView!
     
-    @IBAction func inverColorsButtonTapped(_ sender: Any) {
+    @IBAction func invertColorsButtonTapped(_ sender: Any) {
         let newImage = imageView.image?.convertImageToBW()
         finalImages.append(newImage!)
         collectionView.reloadData()
@@ -29,7 +29,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     
     @IBAction func rotateButtonTapped(_ sender: Any) {
-       let newImage = imageView.image?.imageRotatedByDegrees(degrees: 90, flip: false)
+        let newImage = imageView.image?.imageRotatedByDegrees(degrees: 90, flip: false)
         finalImages.append(newImage!)
         collectionView.reloadData()
     }
@@ -50,8 +50,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         imageView.image = selectedPhoto
         dismiss(animated: true, completion: nil)
     }
-
-
+    
+    
 }
 
 extension ViewController: UICollectionViewDataSource {
@@ -82,27 +82,24 @@ extension ViewController: UICollectionViewDelegate {
             print("Photo Saved Successfully")
         }
     }
-
+    
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let image = finalImages[indexPath.row]
         
         let questionController = UIAlertController(title: "What u wanna do?", message: nil, preferredStyle: .alert)
         
-        questionController.addAction(UIAlertAction(title: "Reeuse Image", style: .default, handler: {
+        questionController.addAction(UIAlertAction(title: "Reuse Image", style: .default, handler: {
             
             (action:UIAlertAction!) -> Void in
             self.imageView.image = image
-    
+            
         }))
         
         questionController.addAction(UIAlertAction(title: "Save", style: .destructive, handler: {
             
             (action:UIAlertAction!) -> Void in
-             UIImageWriteToSavedPhotosAlbum(image, self, nil, nil)
-//            let save = Base()
-//            save.save_image(img: image)
-            
+            UIImageWriteToSavedPhotosAlbum(image, self, nil, nil)
             
             self.collectionView.reloadData()
         }))
@@ -111,23 +108,15 @@ extension ViewController: UICollectionViewDelegate {
             
             (action:UIAlertAction!) -> Void in
             
-            print("hello world")
             self.finalImages.remove(at: indexPath.row)
             self.collectionView.reloadData()
             
         }))
         
-    
-        
         present(questionController, animated: true, completion: nil)
     }
     
 }
-
-
-
-
-
 
 extension UIImage {
     

@@ -43,6 +43,7 @@
                                 <state key="normal" title="Invert colors"/>
                                 <connections>
                                     <action selector="inverColorsButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="3lJ-Ya-tlk"/>
+                                    <action selector="invertColorsButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="9hd-kB-4FF"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3oU-7z-3IS">
