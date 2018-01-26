@@ -22,9 +22,23 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     @IBAction func mirrorImageButtonTapped(_ sender: Any) {
-        let newImage = imageView.image?.imageRotatedByDegrees(degrees: 0, flip: true)
-        finalImages.append(newImage!)
-        collectionView.reloadData()
+        
+        let processingQueue = OperationQueue()
+        
+        guard let oldImage = imageView.image else {return}
+        
+        processingQueue.addOperation() {
+            // background thread
+            // long operation
+            sleep(5)
+            let newImage = oldImage.imageRotatedByDegrees(degrees: 0, flip: true)
+            
+            OperationQueue.main.addOperation() {
+                // Main thread
+                self.finalImages.append(newImage)
+                self.collectionView.reloadData()
+            }
+        }
     }
     
     
