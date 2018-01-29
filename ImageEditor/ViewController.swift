@@ -10,42 +10,75 @@ import UIKit
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    var finalImages = [UIImage]()
+    var items: [ImageItem] = []
+    
     
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var imageView: UIImageView!
     
+    
     @IBAction func invertColorsButtonTapped(_ sender: Any) {
-        let newImage = imageView.image?.convertImageToBW()
-        finalImages.append(newImage!)
-        collectionView.reloadData()
+        doConversion(type: .invertColors)
     }
     
-    @IBAction func mirrorImageButtonTapped(_ sender: Any) {
-        
+    @IBAction func mirrorImageButtonTapped(_ sender: UIButton) {
+        doConversion(type: .mirror)
+    }
+    
+    @IBAction func rotateButtonTapped(_ sender: Any) {
+        doConversion(type: .rotate)
+    }
+    
+    func doConversion(type: ImageModificationType) {
         let processingQueue = OperationQueue()
         
         guard let oldImage = imageView.image else {return}
         
+        let newItem = ImageItem(initialImage: oldImage)
+        items.insert(newItem, at: 0)
+        collectionView.reloadData()
+        
         processingQueue.addOperation() {
+            
+            let totalDelay = 5 + Int(arc4random_uniform(UInt32(30 - 5 + 1)))
+            print("\(totalDelay)")
+            
+            let progressStep:Float = 1 / Float(totalDelay)
+            
+            for _ in 0..<totalDelay {
+                
+                sleep(1)
+                
+                OperationQueue.main.addOperation() {
+                    // Main thread
+                    
+                    newItem.progress += progressStep
+                    self.updateCellForItem(item: newItem)
+                }
+            }
+            
             // background thread
             // long operation
-            sleep(5)
-            let newImage = oldImage.imageRotatedByDegrees(degrees: 0, flip: true)
+            let newImage = oldImage.convert(type: type)
             
             OperationQueue.main.addOperation() {
                 // Main thread
-                self.finalImages.append(newImage)
-                self.collectionView.reloadData()
+                newItem.progress = 1.0 // to be sure
+                newItem.image = newImage
+                self.updateCellForItem(item: newItem)
             }
         }
     }
     
-    
-    @IBAction func rotateButtonTapped(_ sender: Any) {
-        let newImage = imageView.image?.imageRotatedByDegrees(degrees: 90, flip: false)
-        finalImages.append(newImage!)
-        collectionView.reloadData()
+    func updateCellForItem(item: ImageItem) {
+        
+        guard let index = items.index(where: { $0 === item }) else { return }
+        let indexPath = IndexPath(row: index, section: 0)
+        if let cell = self.collectionView.cellForItem(at: indexPath) as? CollectionCell{
+            cell.cellImage.image = item.image
+            cell.progressBar.isHidden = !item.isProgressBarVisible
+            cell.progressBar.progress = item.progress
+        }
     }
     
     @IBAction func tapImageView(_ sender: UITapGestureRecognizer) {
@@ -70,16 +103,16 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
 
 extension ViewController: UICollectionViewDataSource {
     
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return finalImages.count
+        return items.count
     }
     
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! CollectionCell
-        cell.backgroundColor = UIColor.darkGray
-        cell.cellImage.image = finalImages[indexPath.row]
+        
+        let imageItem = items[indexPath.row]
+        updateCellForItem(item: imageItem)
         return cell
     }
     
@@ -87,33 +120,22 @@ extension ViewController: UICollectionViewDataSource {
 
 extension ViewController: UICollectionViewDelegate {
     
-    class Base {
-        func save_image(img:UIImage) {
-            UIImageWriteToSavedPhotosAlbum(img, self, #selector(Base.image(_:didFinishSavingWithError:contextInfo:)), nil)
-        }
-        
-        @objc func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-            print("Photo Saved Successfully")
-        }
-    }
-    
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let image = finalImages[indexPath.row]
+     //   let image = finalImages[indexPath.row]
         
         let questionController = UIAlertController(title: "What u wanna do?", message: nil, preferredStyle: .alert)
         
         questionController.addAction(UIAlertAction(title: "Reuse Image", style: .default, handler: {
             
             (action:UIAlertAction!) -> Void in
-            self.imageView.image = image
             
+     //       self.imageView.image = image
         }))
         
         questionController.addAction(UIAlertAction(title: "Save", style: .destructive, handler: {
             
             (action:UIAlertAction!) -> Void in
-            UIImageWriteToSavedPhotosAlbum(image, self, nil, nil)
+      //      UIImageWriteToSavedPhotosAlbum(image, self, nil, nil)
             
             self.collectionView.reloadData()
         }))
@@ -122,7 +144,7 @@ extension ViewController: UICollectionViewDelegate {
             
             (action:UIAlertAction!) -> Void in
             
-            self.finalImages.remove(at: indexPath.row)
+         //   self.finalImages.remove(at: indexPath.row)
             self.collectionView.reloadData()
             
         }))
@@ -133,6 +155,17 @@ extension ViewController: UICollectionViewDelegate {
 }
 
 extension UIImage {
+    
+    func convert(type: ImageModificationType) -> UIImage {
+        switch type {
+        case .invertColors:
+            return self.convertImageToBW()
+        case .mirror:
+            return self.imageRotatedByDegrees(degrees: 0, flip: true)
+        case .rotate:
+            return self.imageRotatedByDegrees(degrees: 90, flip: false)
+        }
+    }
     
     func imageRotatedByDegrees(degrees: CGFloat, flip: Bool) -> UIImage {
         let radiansToDegrees: (CGFloat) -> CGFloat = {
@@ -190,6 +223,9 @@ extension UIImage {
     }
 }
 
+enum ImageModificationType {
+    case mirror, invertColors, rotate
+}
 
 
 

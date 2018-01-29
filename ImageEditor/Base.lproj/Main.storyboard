@@ -42,8 +42,7 @@
                                 <color key="backgroundColor" red="0.83741801979999997" green="0.83743780850000005" blue="0.83742713930000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title="Invert colors"/>
                                 <connections>
-                                    <action selector="inverColorsButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="3lJ-Ya-tlk"/>
-                                    <action selector="invertColorsButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="9hd-kB-4FF"/>
+                                    <action selector="invertColorsButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="XLC-ET-yNk"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3oU-7z-3IS">
@@ -78,10 +77,15 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="150" height="150"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
+                                                <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" fixedFrame="YES" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="RMB-Oz-mxH">
+                                                    <rect key="frame" x="0.0" y="73" width="150" height="3"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </progressView>
                                             </subviews>
                                         </view>
                                         <connections>
                                             <outlet property="cellImage" destination="tBm-7z-nry" id="shb-jV-1qT"/>
+                                            <outlet property="progressBar" destination="RMB-Oz-mxH" id="Apq-Wc-MRX"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
