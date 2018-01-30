@@ -16,6 +16,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var imageView: UIImageView!
     
+    @IBAction func halfMirrorButtonTapped(_ sender: Any) {
+        doConversion(type: .halfMirror)
+    }
+    
+    @IBAction func grayScaleButtonTapped(_ sender: Any) {
+    }
     
     @IBAction func invertColorsButtonTapped(_ sender: Any) {
         doConversion(type: .invertColors)
@@ -30,6 +36,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     func doConversion(type: ImageModificationType) {
+        
         let processingQueue = OperationQueue()
         
         guard let oldImage = imageView.image else {return}
@@ -40,7 +47,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
         processingQueue.addOperation() {
             
-            let totalDelay = 5 + Int(arc4random_uniform(UInt32(30 - 5 + 1)))
+          //  let totalDelay = 5 + Int(arc4random_uniform(UInt32(30 - 5 + 1)))
+            let totalDelay = 1
             print("\(totalDelay)")
             
             let progressStep:Float = 1 / Float(totalDelay)
@@ -121,30 +129,31 @@ extension ViewController: UICollectionViewDataSource {
 extension ViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-     //   let image = finalImages[indexPath.row]
+        
+        let image = items[indexPath.row].image
         
         let questionController = UIAlertController(title: "What u wanna do?", message: nil, preferredStyle: .alert)
         
         questionController.addAction(UIAlertAction(title: "Reuse Image", style: .default, handler: {
             
             (action:UIAlertAction!) -> Void in
+            self.imageView.image = image
             
-     //       self.imageView.image = image
         }))
         
         questionController.addAction(UIAlertAction(title: "Save", style: .destructive, handler: {
             
             (action:UIAlertAction!) -> Void in
-      //      UIImageWriteToSavedPhotosAlbum(image, self, nil, nil)
-            
+            UIImageWriteToSavedPhotosAlbum(image!, self, nil, nil)
             self.collectionView.reloadData()
+            
         }))
         
         questionController.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: {
             
             (action:UIAlertAction!) -> Void in
             
-         //   self.finalImages.remove(at: indexPath.row)
+            self.items.remove(at: indexPath.row)
             self.collectionView.reloadData()
             
         }))
@@ -155,7 +164,7 @@ extension ViewController: UICollectionViewDelegate {
 }
 
 enum ImageModificationType {
-    case mirror, invertColors, rotate, grayScale
+    case mirror, invertColors, rotate, grayScale, halfMirror
 }
 
 extension UIImage {
@@ -170,8 +179,77 @@ extension UIImage {
             return self.imageRotatedByDegrees(degrees: 90, flip: false)
         case .grayScale:
             return self.convertImageToBW()
+        case .halfMirror:
+            return self.halfMirror()
         
         }
+    }
+    
+    func halfMirror() -> UIImage {
+        
+        var flippedOrientation: UIImageOrientation = .downMirrored
+       
+        switch imageOrientation {
+        case .up:
+            break
+        case .down:
+            flippedOrientation = .downMirrored
+        case .left:
+            break
+        case .right:
+            break
+        case .upMirrored:
+            break
+        case .downMirrored:
+            break
+        case .leftMirrored:
+            break
+        case .rightMirrored:
+            break
+        }
+        
+        var flippedImage = UIImage(cgImage: cgImage!, scale: 1.0, orientation: flippedOrientation)
+        
+        var inImage = cgImage!
+    
+        var ctx = CGContext(data: nil,
+                                width: inImage.width,
+                                height: inImage.height,
+                                bitsPerComponent: inImage.bitsPerComponent,
+                                bytesPerRow: inImage.bytesPerRow,
+                                space: inImage.colorSpace!,
+                                bitmapInfo: inImage.bitmapInfo.rawValue)
+        
+        var cropRect = CGRect(x: flippedImage.size.width / 2, y: 0, width: flippedImage.size.width / 2, height: flippedImage.size.height)
+        
+        var theOtherHalf = flippedImage.cgImage?.cropping(to: cropRect)
+        
+        ctx?.draw(inImage, in: CGRect(x: 0, y: 0, width: inImage.width, height: inImage.height))
+        
+        var transform = CGAffineTransform(translationX: flippedImage.size.width, y: 0.0)
+        transform = transform.scaledBy(x: -1.0, y: 1.0)
+        
+        ctx?.concatenate(transform)
+        ctx?.draw(theOtherHalf!, in: cropRect)
+        
+        var imageRef: CGImage = ctx!.makeImage()!
+        
+        var finalImage = UIImage(cgImage: imageRef)
+
+
+        return finalImage
+        
+        
+       
+   
+//        let cropRect = CGRect(x: 0, y: 0, width: image.size.width / 2, height: image.size.height)
+//        UIGraphicsBeginImageContextWithOptions(cropRect.size, false, image.scale)
+//        let origin = CGPoint(x: cropRect.origin.x * CGFloat(-1), y: cropRect.origin.y * CGFloat(-1))
+//        image.draw(in: CGRect(x: 0, y: 0, width: image.size.width / 2, height: image.size.height))
+//        let result = UIGraphicsGetImageFromCurrentImageContext()
+//        UIGraphicsEndImageContext();
+//
+//        return result!
     }
     
     func invertColors(cgResult: Bool) -> UIImage? {
