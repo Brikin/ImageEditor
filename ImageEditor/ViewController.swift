@@ -36,9 +36,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     func doConversion(type: ImageModificationType) {
         
+        guard let oldImage = imageView.image else { return }
+
         let processingQueue = OperationQueue()
-        
-        guard let oldImage = imageView.image else {return}
         
         let newItem = ImageItem(initialImage: oldImage)
         items.insert(newItem, at: 0)
@@ -46,9 +46,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
         processingQueue.addOperation() {
             
-         //   let totalDelay = 5 + Int(arc4random_uniform(UInt32(30 - 5 + 1)))
-            let totalDelay = 2
-            print("\(totalDelay)")
+            // Background thread
+            
+            let totalDelay = 5 + Int(arc4random_uniform(UInt32(30 - 5 + 1)))
+
+            print("Delay \(totalDelay)")
             
             let progressStep:Float = 1 / Float(totalDelay)
             
@@ -57,34 +59,24 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                 sleep(1)
                 
                 OperationQueue.main.addOperation() {
-                    // Main thread
                     
+                    // Main thread
                     newItem.progress += progressStep
-                    self.updateCellForItem(item: newItem)
+                    self.collectionView.reloadData()
                 }
             }
             
             // background thread
-            // long operation
+            // perform long operation
             let newImage = oldImage.convert(type: type)
             
             OperationQueue.main.addOperation() {
                 // Main thread
+                
                 newItem.progress = 1.0 // to be sure
                 newItem.image = newImage
-                self.updateCellForItem(item: newItem)
+                self.collectionView.reloadData()
             }
-        }
-    }
-    
-    func updateCellForItem(item: ImageItem) {
-        
-        guard let index = items.index(where: { $0 === item }) else { return }
-        let indexPath = IndexPath(row: index, section: 0)
-        if let cell = self.collectionView.cellForItem(at: indexPath) as? CollectionCell{
-            cell.cellImage.image = item.image
-            cell.progressBar.isHidden = !item.isProgressBarVisible
-            cell.progressBar.progress = item.progress
         }
     }
     
@@ -118,8 +110,12 @@ extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! CollectionCell
         
-        let imageItem = items[indexPath.row]
-        updateCellForItem(item: imageItem)
+        let item = items[indexPath.row]
+        
+        cell.cellImage.image = item.image
+        cell.progressBar.isHidden = !item.isProgressBarVisible
+        cell.progressBar.progress = item.progress
+
         return cell
     }
 }
