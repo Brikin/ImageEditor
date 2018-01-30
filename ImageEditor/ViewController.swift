@@ -12,7 +12,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     var items: [ImageItem] = []
     
-    
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var imageView: UIImageView!
     
@@ -47,8 +46,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
         processingQueue.addOperation() {
             
-          //  let totalDelay = 5 + Int(arc4random_uniform(UInt32(30 - 5 + 1)))
-            let totalDelay = 1
+         //   let totalDelay = 5 + Int(arc4random_uniform(UInt32(30 - 5 + 1)))
+            let totalDelay = 2
             print("\(totalDelay)")
             
             let progressStep:Float = 1 / Float(totalDelay)
@@ -105,9 +104,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         imageView.image = selectedPhoto
         dismiss(animated: true, completion: nil)
     }
-    
-    
 }
+
+//MARK: - Collection DataSource
 
 extension ViewController: UICollectionViewDataSource {
     
@@ -123,7 +122,6 @@ extension ViewController: UICollectionViewDataSource {
         updateCellForItem(item: imageItem)
         return cell
     }
-    
 }
 
 extension ViewController: UICollectionViewDelegate {
@@ -138,7 +136,6 @@ extension ViewController: UICollectionViewDelegate {
             
             (action:UIAlertAction!) -> Void in
             self.imageView.image = image
-            
         }))
         
         questionController.addAction(UIAlertAction(title: "Save", style: .destructive, handler: {
@@ -160,8 +157,9 @@ extension ViewController: UICollectionViewDelegate {
         
         present(questionController, animated: true, completion: nil)
     }
-    
 }
+
+// MARK: - extension UIImage
 
 enum ImageModificationType {
     case mirror, invertColors, rotate, grayScale, halfMirror
@@ -169,7 +167,7 @@ enum ImageModificationType {
 
 extension UIImage {
     
-    func convert(type: ImageModificationType) -> UIImage {
+    func convert(type: ImageModificationType) -> UIImage? {
         switch type {
         case .invertColors:
             return self.invertColors(cgResult: true)!
@@ -181,75 +179,39 @@ extension UIImage {
             return self.convertImageToBW()
         case .halfMirror:
             return self.halfMirror()
-        
+            
         }
     }
     
-    func halfMirror() -> UIImage {
+    func halfMirror() -> UIImage? {
+        guard let cgImage = cgImage else { return nil }
+        guard let ctx = CGContext(data: nil,
+                                  width: cgImage.width,
+                                  height: cgImage.height,
+                                  bitsPerComponent: cgImage.bitsPerComponent,
+                                  bytesPerRow: cgImage.bytesPerRow,
+                                  space: cgImage.colorSpace!,
+                                  bitmapInfo: cgImage.bitmapInfo.rawValue) else { return nil }
         
-        var flippedOrientation: UIImageOrientation = .downMirrored
-       
-        switch imageOrientation {
-        case .up:
-            break
-        case .down:
-            flippedOrientation = .downMirrored
-        case .left:
-            break
-        case .right:
-            break
-        case .upMirrored:
-            break
-        case .downMirrored:
-            break
-        case .leftMirrored:
-            break
-        case .rightMirrored:
-            break
-        }
+        let flippedImage = UIImage(cgImage: cgImage)
         
-        var flippedImage = UIImage(cgImage: cgImage!, scale: 1.0, orientation: flippedOrientation)
+        let cropRect = CGRect(x: 0, y: 0, width: flippedImage.size.width / 2, height: flippedImage.size.height)
         
-        var inImage = cgImage!
-    
-        var ctx = CGContext(data: nil,
-                                width: inImage.width,
-                                height: inImage.height,
-                                bitsPerComponent: inImage.bitsPerComponent,
-                                bytesPerRow: inImage.bytesPerRow,
-                                space: inImage.colorSpace!,
-                                bitmapInfo: inImage.bitmapInfo.rawValue)
+        let theOtherHalf = flippedImage.cgImage?.cropping(to: cropRect)
         
-        var cropRect = CGRect(x: flippedImage.size.width / 2, y: 0, width: flippedImage.size.width / 2, height: flippedImage.size.height)
-        
-        var theOtherHalf = flippedImage.cgImage?.cropping(to: cropRect)
-        
-        ctx?.draw(inImage, in: CGRect(x: 0, y: 0, width: inImage.width, height: inImage.height))
+        ctx.draw(cgImage, in: CGRect(x: 0, y: 0, width: cgImage.width, height: cgImage.height))
         
         var transform = CGAffineTransform(translationX: flippedImage.size.width, y: 0.0)
         transform = transform.scaledBy(x: -1.0, y: 1.0)
         
-        ctx?.concatenate(transform)
-        ctx?.draw(theOtherHalf!, in: cropRect)
+        ctx.concatenate(transform)
+        ctx.draw(theOtherHalf!, in: cropRect)
         
-        var imageRef: CGImage = ctx!.makeImage()!
+        let imageRef: CGImage = ctx.makeImage()!
         
-        var finalImage = UIImage(cgImage: imageRef)
-
+        let finalImage = UIImage(cgImage: imageRef)
 
         return finalImage
-        
-        
-       
-   
-//        let cropRect = CGRect(x: 0, y: 0, width: image.size.width / 2, height: image.size.height)
-//        UIGraphicsBeginImageContextWithOptions(cropRect.size, false, image.scale)
-//        let origin = CGPoint(x: cropRect.origin.x * CGFloat(-1), y: cropRect.origin.y * CGFloat(-1))
-//        image.draw(in: CGRect(x: 0, y: 0, width: image.size.width / 2, height: image.size.height))
-//        let result = UIGraphicsGetImageFromCurrentImageContext()
-//        UIGraphicsEndImageContext();
-//
-//        return result!
     }
     
     func invertColors(cgResult: Bool) -> UIImage? {
@@ -318,18 +280,5 @@ extension UIImage {
         return processedImage
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
