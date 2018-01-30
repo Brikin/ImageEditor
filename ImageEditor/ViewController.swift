@@ -222,19 +222,19 @@ extension UIImage {
     }
     
     func imageRotatedByDegrees(degrees: CGFloat, flip: Bool) -> UIImage {
-        let radiansToDegrees: (CGFloat) -> CGFloat = {
-            return $0 * (180.0 / CGFloat.pi)
-        }
         let degreesToRadians: (CGFloat) -> CGFloat = {
             return $0 / 180.0 * CGFloat.pi
         }
         
-        // calculate the size of the rotated view's containing box for our drawing space
-        let rotatedViewBox = UIView(frame: CGRect(origin: .zero, size: size))
-        let t = CGAffineTransform(rotationAngle: degreesToRadians(degrees));
-        rotatedViewBox.transform = t
-        let rotatedSize = rotatedViewBox.frame.size
-        
+        let rotatedSize: CGSize
+        if degrees == 90 {
+            rotatedSize = CGSize(width: size.height, height: size.width)
+        } else if degrees == 0 {
+            rotatedSize = size
+        } else {
+            fatalError()
+        }
+
         // Create the bitmap context
         UIGraphicsBeginImageContext(rotatedSize)
         let bitmap = UIGraphicsGetCurrentContext()
