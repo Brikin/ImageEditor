@@ -20,6 +20,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     @IBAction func grayScaleButtonTapped(_ sender: Any) {
+        doConversion(type: .grayScale)
     }
     
     @IBAction func invertColorsButtonTapped(_ sender: Any) {
